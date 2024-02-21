@@ -17,3 +17,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/nbproject/private/
+_ide_helper.php
+frontmatter.json
