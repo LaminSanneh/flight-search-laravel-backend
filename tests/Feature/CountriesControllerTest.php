@@ -9,16 +9,20 @@ use Tests\TestCase;
 
 class CountriesControllerTest extends TestCase
 {
-    const STRAPI_CMS_API_URL = 'STRAPI_CMS_API_URL';
-    
+    public const STRAPI_CMS_API_URL = 'STRAPI_CMS_API_URL';
+
     public function test_get_countries(): void
     {
         $strapiUrl = \Illuminate\Support\Facades\Config::get(
             'strapi.strapi_cms_api_url'
         );
-        
+
+        $strapApiKey = \Illuminate\Support\Facades\Config::get(
+            'strapi.strapi_cms_api_token'
+        );
+
         Http::preventStrayRequests();
-        
+
         Http::fake([
             $strapiUrl . '/countries' => Http::response([
                 'data' => [
@@ -45,7 +49,7 @@ class CountriesControllerTest extends TestCase
                 ]
             ], 200)
         ]);
-        
+
         Http::fake([
             $strapiUrl . '/airlines' => Http::response([
                 'data' => [
@@ -76,14 +80,31 @@ class CountriesControllerTest extends TestCase
                 ]
             ], 200)
         ]);
-        
 
-        
-        $response = $this->get('/api/getCountries');
-        
         $numberOfCountries = 2;
         $numberOfAirlines = 2;
-              
+        $numberOfHttpCallsToStrapiBackend = 2;
+
+
+        $response = $this->get('/api/getCountries');
+
+        Http::assertSentCount($numberOfHttpCallsToStrapiBackend);
+        
+        $this->assertAllStrapiApiCallsHaveAuthorizationToken();
+        $this->assertAllStrapiApiCallsHaveAuthorizationToken();
+        
+        Http::assertSent(function (
+            \Illuminate\Http\Client\Request $request
+        ) {
+            return $request->url() === 'http://localhost:1337/api/countries';
+        });
+
+        Http::assertSent(function (
+            \Illuminate\Http\Client\Request $request
+        ) {
+            return $request->url() === 'http://localhost:1337/api/airlines';
+        });
+
         $response
             ->assertJsonCount($numberOfCountries, 'countries')
             ->assertJsonCount($numberOfAirlines, 'airlines')
@@ -113,5 +134,20 @@ class CountriesControllerTest extends TestCase
             ]);
 
         $response->assertOk();
+    }
+
+    private function assertAllStrapiApiCallsHaveAuthorizationToken() {
+        $strapApiKey = \Illuminate\Support\Facades\Config::get(
+            'strapi.strapi_cms_api_token'
+        );
+        
+        Http::assertSent(function (
+            \Illuminate\Http\Client\Request $request
+        ) use ($strapApiKey) {
+            return $request->hasHeader(
+                'Authorization',
+                "Bearer {$strapApiKey}"
+            );
+        });
     }
 }
