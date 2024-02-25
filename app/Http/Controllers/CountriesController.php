@@ -19,15 +19,15 @@ class CountriesController extends Controller
                 fn (
                     \Illuminate\Http\Client\Pool $pool
                 ) => [
-            $pool
-                ->as('countries')
-                ->withToken($strapiApiKey)
-                ->get($strapiUrl . '/countries'),
-            $pool
-                ->as('airlines')
-                ->withToken($strapiApiKey)
-                ->get($strapiUrl . '/airlines')
-        ]
+                    $pool
+                        ->as('countries')
+                        ->withToken($strapiApiKey)
+                        ->get($strapiUrl . '/countries'),
+                    $pool
+                        ->as('airlines')
+                        ->withToken($strapiApiKey)
+                        ->get($strapiUrl . '/airlines')
+                ]
             );
 
         return $this->formatMultipleStrapiResults($responses);

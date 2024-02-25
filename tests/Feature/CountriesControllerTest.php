@@ -11,14 +11,10 @@ class CountriesControllerTest extends TestCase
 {
     public const STRAPI_CMS_API_URL = 'STRAPI_CMS_API_URL';
 
-    public function test_get_countries(): void
+    public function testGetCountries(): void
     {
         $strapiUrl = \Illuminate\Support\Facades\Config::get(
             'strapi.strapi_cms_api_url'
-        );
-
-        $strapApiKey = \Illuminate\Support\Facades\Config::get(
-            'strapi.strapi_cms_api_token'
         );
 
         Http::preventStrayRequests();
