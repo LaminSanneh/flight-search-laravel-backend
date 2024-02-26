@@ -21,34 +21,21 @@ class SearchFlightService {
 
     public function getFlightResults(Requests\SearchFlightRequest $request) {
         
-        $apiRequestParams = [
-            'filters' => [
-                'origin_airport_code' => [
-                    '$eq' => $request->fromAirportLocation
-                ],
-                'destination_airport_code' => [
-                    '$eq' => $request->fromAirportLocation
-                ],
-                'departure_time' => [
-                    '$gte' => $request->fromDate
-                ]
-            ]
-        ];
-        
         $responses = \Illuminate\Support\Facades\Http::pool(
-                function (Pool $pool
+            function (
+                Pool $pool
             ) use ($request) {
             
             $outboundQueryParams = [
                 'filters' => [
                     'origin_airport_code' => [
-                        '$eq' => 'KZN'
+                        '$eq' => $request->fromAirportLocation
                     ],
                     'destination_airport_code' => [
-                        '$eq' => 'AER'
+                        '$eq' => $request->toAirportLocation
                     ],
                     'departure_time' => [
-                        '$gte' => '2024-06-28'
+                        '$gte' => $request->fromDate
                     ]
                 ]
             ];
@@ -66,13 +53,13 @@ class SearchFlightService {
                 $inboundQueryParams = [
                     'filters' => [
                         'origin_airport_code' => [
-                            '$eq' => 'AER'
+                            '$eq' => $request->toAirportLocation
                         ],
                         'destination_airport_code' => [
-                            '$eq' => 'KZN'
+                            '$eq' => $request->fromAirportLocation
                         ],
                         'departure_time' => [
-                            '$gte' => '2024-07-28'
+                            '$gte' => $request->toDate
                         ]
                     ]
                 ];
